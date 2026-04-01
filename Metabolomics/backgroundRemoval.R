@@ -173,7 +173,24 @@ dev.off()
 
 
 # MS -- Cleaning - Internal standard check --------------------------------
+# We used sulfadimethoxine as the internal standard
+# sulfadimethoxine was matched to multiple features
+sulfFeatures <- c(58886, 65545, 66261, 64385, 61230)
 
+pdf('./Metabolomics/qcPlots/internalStandard.pdf', width = 15, height = 10)
+msBlankRemoval%>%
+  filter(featureNumber %in% sulfFeatures)%>%
+  group_by(fileName)%>%
+  summarize_if(is.numeric, sum)%>%
+  ungroup()%>%
+  mutate(xic = log10(xic))%>%
+  ggplot(aes(fileName, xic)) +
+  geom_bar(stat = 'identity') +
+  genTheme() +
+  # facet_wrap(~featureNumber) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 9)) +
+  labs(x = 'sample fileName', y = 'sulfadimethoxine intensity (XIC)')
+dev.off()
 
 # MS -- Cleaning - working data frame -------------------------------------
 msWdf <- msBlanksRemoved%>%
